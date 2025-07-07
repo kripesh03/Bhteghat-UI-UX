@@ -27,7 +27,7 @@ const createAOrder = async (req, res) => {
     });
 
     const mailOptions = {
-      from: `"SonicSummit" <${process.env.EMAIL_USER}>`,
+      from: `"Bhetghat" <${process.env.EMAIL_USER}>`,
       to: savedOrder.email,
       subject: "Your Order Confirmation",
       text: `Hello ${savedOrder.name},\n\nThank you for your order. Please find the product files attached.`,

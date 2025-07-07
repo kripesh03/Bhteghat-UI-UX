@@ -6,9 +6,9 @@ import { FiFilter } from "react-icons/fi";
 const categories = [
   "Music",
   "Art",
-  "Food",
-  "Workshop",
-  "Festival",
+  "Community",
+  "Social",
+  "Technology",
   "Networking",
 ];
 

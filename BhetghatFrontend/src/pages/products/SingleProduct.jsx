@@ -6,6 +6,7 @@ import { useFetchProductByIdQuery } from "../../redux/features/products/productA
 import { getImgUrl } from "../../utils/getImgUrl";
 import { CalendarDays, MapPin } from "lucide-react";
 
+
 const SingleProduct = () => {
   const { id } = useParams();
   const { data: product, isLoading, isError } = useFetchProductByIdQuery(id);

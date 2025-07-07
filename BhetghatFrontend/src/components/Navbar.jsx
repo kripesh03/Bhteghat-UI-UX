@@ -10,8 +10,6 @@ import { useSelector } from "react-redux";
 import footerLogo from "../assets/div.png";
 
 const navigation = [
-  { name: "Dashboard", href: "/user-dashboard" },
-  { name: "Orders", href: "/orders" },
   { name: "Your Events", href: "/your-events" },
 ];
 

@@ -1,122 +1,174 @@
-import axios from 'axios';
+// Dashboard.jsx (Updated with smaller pie chart)
 import React, { useEffect, useState } from 'react';
-import { MdIncompleteCircle } from 'react-icons/md';
-import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import getBaseUrl from '../../utils/baseURL';
+import { MdEventNote, MdAttachMoney, MdShoppingCart, MdCategory } from 'react-icons/md';
 import RevenueChart from './RevenueChart';
-import Footer from '../../components/Footer';
+import { useNavigate } from 'react-router-dom';
+import { Pie } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend
+} from 'chart.js';
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 const Dashboard = () => {
-    const [data, setData] = useState({});
-    const [orders, setOrders] = useState([]);  // New state for orders
-    const navigate = useNavigate();
+  const [stats, setStats] = useState({
+    totalEvents: 0,
+    totalSales: 0,
+    totalOrders: 0,
+    eventsByCategory: {},
+    upcomingEvents: [],
+  });
+  const [revenueData, setRevenueData] = useState(Array(12).fill(0));
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchAdminData = async () => {
-            try {
-                // Fetch the admin data
-                const response = await axios.get(`${getBaseUrl()}/api/admin2`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                        'Content-Type': 'application/json',
-                    },
-                });
-
-                setData(response.data);
-            } catch (error) {
-                console.error('Error fetching admin data:', error);
-            }
-        };
-
-        const fetchOrders = async () => {
-            try {
-                // Fetch the orders data
-                const response = await axios.get(`${getBaseUrl()}/api/orders/`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                        'Content-Type': 'application/json',
-                    },
-                });
-
-                setOrders(response.data);  // Set the fetched orders
-            } catch (error) {
-                console.error('Error fetching orders data:', error);
-            }
-        };
-
-        fetchAdminData();
-        fetchOrders();
-    }, []);
-
-    const calculateMonthlyRevenue = () => {
-        const monthlyRevenue = Array(12).fill(0); // Initialize an array with 12 months
-
-        orders.forEach(order => {
-            const orderDate = new Date(order.createdAt);  // Parse the createdAt field
-            const month = orderDate.getMonth(); // Get the month index (0 = Jan, 1 = Feb, ..., 11 = Dec)
-            monthlyRevenue[month] += order.totalPrice; // Add the totalPrice to the corresponding month
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const res = await axios.get(`${getBaseUrl()}/api/admin2`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
         });
 
-        return monthlyRevenue;
+        const productRes = await axios.get(`${getBaseUrl()}/api/product`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+
+        const allEvents = productRes.data || [];
+        const upcomingEvents = allEvents
+          .filter(e => new Date(e.date) > new Date())
+          .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        const eventsByCategory = allEvents.reduce((acc, cur) => {
+          acc[cur.category] = (acc[cur.category] || 0) + 1;
+          return acc;
+        }, {});
+
+        setStats({
+          totalEvents: res.data.totalProducts,
+          totalSales: parseFloat(res.data.totalSales).toFixed(2),
+          totalOrders: res.data.totalOrders,
+          eventsByCategory,
+          upcomingEvents,
+        });
+
+        const monthlySales = res.data.monthlySales || [];
+        const monthlyRevenue = Array(12).fill(0);
+        monthlySales.forEach(entry => {
+          const month = new Date(entry._id + '-01').getMonth();
+          monthlyRevenue[month] = entry.totalSales;
+        });
+        setRevenueData(monthlyRevenue);
+
+      } catch (err) {
+        console.error('Failed to fetch dashboard stats', err);
+      }
     };
 
-    return (
-        <>
-            {/* Stats Section */}
-            <section className="grid md:grid-cols-2 xl:grid-cols-4 gap-6">
-                <div className="flex items-center p-8 bg-white shadow rounded-lg">
-                    <div className="inline-flex flex-shrink-0 items-center justify-center h-16 w-16 text-purple-600 bg-purple-100 rounded-full mr-6">
-                        <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-6 w-6">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                        </svg>
-                    </div>
-                    <div>
-                        <span className="block text-2xl font-bold">{data?.totalProducts}</span>
-                        <span className="block text-gray-500">Products</span>
-                    </div>
-                </div>
-                <div className="flex items-center p-8 bg-white shadow rounded-lg">
-                    <div className="inline-flex flex-shrink-0 items-center justify-center h-16 w-16 text-green-600 bg-green-100 rounded-full mr-6">
-                        <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-6 w-6">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                        </svg>
-                    </div>
-                    <div>
-                        <span className="block text-2xl font-bold">Rs. {data?.totalSales}</span>
-                        <span className="block text-gray-500">Total Sales</span>
-                    </div>
-                </div>
-                <div className="flex items-center p-8 bg-white shadow rounded-lg">
-                    <div className="inline-flex flex-shrink-0 items-center justify-center h-16 w-16 text-red-600 bg-red-100 rounded-full mr-6">
-                        <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-6 w-6">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                        </svg>
-                    </div>
-                    <div>
-                        <span className="inline-block text-2xl font-bold">{data?.trendingProducts}</span>
-                        <span className="block text-gray-500">Trending Products in This Month</span>
-                    </div>
-                </div>
-                <div className="flex items-center p-8 bg-white shadow rounded-lg">
-                    <div className="inline-flex flex-shrink-0 items-center justify-center h-16 w-16 text-blue-600 bg-blue-100 rounded-full mr-6">
-                        <MdIncompleteCircle className="size-6" />
-                    </div>
-                    <div>
-                        <span className="block text-2xl font-bold">{data?.totalOrders}</span>
-                        <span className="block text-gray-500">Total Orders</span>
-                    </div>
-                </div>
-            </section>
+    fetchDashboardData();
+  }, []);
 
-            {/* Revenue Chart Section */}
-            <section className="mt-8">
-                {/* Passing the revenue data to the RevenueChart component */}
-                {orders.length > 0 && (
-                    <RevenueChart revenueData={calculateMonthlyRevenue()} />
-                )}
-            </section>
-        </>
-    );
+  const StatCard = ({ title, value, icon, color }) => (
+    <div className="flex items-center p-5 bg-white rounded-lg shadow border">
+      <div className={`h-12 w-12 flex items-center justify-center rounded-full bg-${color}-100 text-${color}-600 mr-4`}>
+        {icon}
+      </div>
+      <div>
+        <div className="text-xl font-bold">{value ?? 0}</div>
+        <div className="text-gray-600 text-sm">{title}</div>
+      </div>
+    </div>
+  );
+
+  const categoryPieData = {
+    labels: Object.keys(stats.eventsByCategory),
+    datasets: [
+      {
+        label: 'Events',
+        data: Object.values(stats.eventsByCategory),
+        backgroundColor: [
+          '#60a5fa', '#fbbf24', '#34d399', '#f472b6', '#818cf8', '#f87171'
+        ],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  return (
+    <div className="px-36 py-6 bg-[#f8fcff] min-h-screen">
+      <div className="flex justify-between items-start mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">Namaste, Organizer!</h1>
+          <p className="text-sm text-gray-600">Welcome back. Here’s an overview of your events and engagement.</p>
+        </div>
+        <button className="bg-blue-100 text-blue-700 px-4 py-1 rounded-full text-sm font-medium">🗓 Active Organizer</button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <StatCard title="Total Events" value={stats.totalEvents} icon={<MdEventNote className="w-6 h-6" />} color="blue" />
+        <StatCard title="Total Sales" value={`Rs. ${stats.totalSales}`} icon={<MdAttachMoney className="w-6 h-6" />} color="green" />
+        <StatCard title="Total Orders" value={stats.totalOrders} icon={<MdShoppingCart className="w-6 h-6" />} color="orange" />
+        <StatCard title="Categories" value={Object.keys(stats.eventsByCategory).length} icon={<MdCategory className="w-6 h-6" />} color="purple" />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white p-5 rounded-lg shadow border min-h-[300px]">
+          <h3 className="font-semibold text-gray-800 mb-2">RSVP Trends (Monthly Sales)</h3>
+          <RevenueChart revenueData={revenueData} />
+        </div>
+        <div className="bg-white p-5 rounded-lg shadow border min-h-[300px] flex items-center justify-center">
+          <div className="w-full max-w-xs">
+            <h3 className="font-semibold text-center text-gray-800 mb-4">Events by Category</h3>
+            <Pie data={categoryPieData} />
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-10">
+        <h3 className="text-lg font-semibold text-gray-800 mb-2">Your Upcoming Events</h3>
+        <div className="bg-white rounded-lg shadow border overflow-x-auto">
+          <table className="w-full text-sm text-left text-gray-700">
+            <thead className="bg-gray-100 text-xs uppercase">
+              <tr>
+                <th className="px-6 py-3">Event</th>
+                <th className="px-6 py-3">Date</th>
+                <th className="px-6 py-3">Category</th>
+                <th className="px-6 py-3">Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stats.upcomingEvents.slice(0, 2).map((event) => (
+                <tr key={event._id}>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center space-x-3">
+                      <div className="h-3 w-3 rounded-full bg-blue-500"></div>
+                      <span>{event.title}</span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">{event.date}</td>
+                  <td className="px-6 py-4">{event.category}</td>
+                  <td className="px-6 py-4">Rs. {parseFloat(event.price?.$numberDecimal ?? 0).toFixed(2)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div
+            onClick={() => navigate('/dashboard/manage-product')}
+            className="p-4 text-right text-blue-500 font-medium cursor-pointer"
+          >
+            View All →
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Dashboard;
