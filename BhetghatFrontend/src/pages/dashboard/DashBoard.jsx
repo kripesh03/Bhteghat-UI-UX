@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import getBaseUrl from '../../utils/baseURL';
-import { MdEventNote, MdAttachMoney, MdShoppingCart, MdCategory } from 'react-icons/md';
+import { MdEventNote, MdAttachMoney, MdPerson4, MdCategory } from 'react-icons/md';
 import RevenueChart from './RevenueChart';
 import { useNavigate } from 'react-router-dom';
 import { Pie } from 'react-chartjs-2';
@@ -113,8 +113,8 @@ const Dashboard = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard title="Total Events" value={stats.totalEvents} icon={<MdEventNote className="w-6 h-6" />} color="blue" />
-        <StatCard title="Total Sales" value={`Rs. ${stats.totalSales}`} icon={<MdAttachMoney className="w-6 h-6" />} color="green" />
-        <StatCard title="Total Orders" value={stats.totalOrders} icon={<MdShoppingCart className="w-6 h-6" />} color="orange" />
+        <StatCard title="Total Revenue" value={`Rs. ${stats.totalSales}`} icon={<MdAttachMoney className="w-6 h-6" />} color="green" />
+        <StatCard title="Total RSVP's" value={stats.totalOrders} icon={<MdPerson4 className="w-6 h-6" />} color="orange" />
         <StatCard title="Categories" value={Object.keys(stats.eventsByCategory).length} icon={<MdCategory className="w-6 h-6" />} color="purple" />
       </div>
 

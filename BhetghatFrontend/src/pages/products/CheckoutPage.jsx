@@ -8,6 +8,7 @@ function CheckoutPage() {
   const cartItems = useSelector(state => state.cart.cartItems);
   const [createOrder] = useCreateOrderMutation();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
   const navigate = useNavigate();
 
   const {
@@ -16,12 +17,23 @@ function CheckoutPage() {
     formState: { errors },
   } = useForm();
 
+  const parsePrice = (price) => {
+    if (price && typeof price === 'object' && price.$numberDecimal) {
+      return parseFloat(price.$numberDecimal);
+    }
+    return parseFloat(price) || 0;
+  };
+
   const totalPrice = cartItems.reduce((acc, item) => {
-    const price = item.new_price && item.new_price.$numberDecimal
-      ? parseFloat(item.new_price.$numberDecimal)
-      : 0;
-    return acc + price;
+    return acc + parsePrice(item.price);
   }, 0).toFixed(2);
+
+  const showToast = (msg, type = 'success') => {
+    setToast({ show: true, message: msg, type });
+    setTimeout(() => {
+      setToast({ show: false, message: '', type: 'success' });
+    }, 3000);
+  };
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);
@@ -41,11 +53,13 @@ function CheckoutPage() {
 
     try {
       await createOrder(newOrder).unwrap();
-      alert("Attendance confirmed successfully!");
-      navigate("/");
-      window.location.reload();
+      showToast("Attendance confirmed successfully!", "success");
+      setTimeout(() => {
+        navigate("/");
+        window.location.reload();
+      }, 1800);
     } catch (error) {
-      alert("Error confirming attendance. Please try again.");
+      showToast("Error confirming attendance. Please try again.", "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -54,10 +68,24 @@ function CheckoutPage() {
   return (
     <div className="flex justify-center items-center bg-gray-50 py-10">
       <div className="w-full max-w-2xl bg-white shadow-lg rounded-2xl px-10 pt-10 pb-8">
+
+        {/* Toast */}
+        {toast.show && (
+          <div className={`fixed top-5 right-5 px-6 py-3 rounded shadow-lg text-white z-50
+            ${toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}>
+            {toast.message}
+          </div>
+        )}
+
         <h2 className="text-2xl font-bold text-center mb-1">Confirm Your Attendance</h2>
         <p className="text-center text-sm text-gray-600 mb-4">
           Please fill out the form below with accurate information. Once you confirm, a confirmation email will be sent to you.
         </p>
+
+        <div className="mb-6 text-center">
+          <h3 className="text-lg font-semibold text-gray-800">Total Amount</h3>
+          <p className="text-2xl font-bold text-blue-600 mt-1">Rs. {totalPrice}</p>
+        </div>
 
         <div className="bg-blue-50 text-blue-900 border border-blue-200 rounded-lg p-4 text-sm mb-6">
           <ul className="list-disc list-inside space-y-1">
