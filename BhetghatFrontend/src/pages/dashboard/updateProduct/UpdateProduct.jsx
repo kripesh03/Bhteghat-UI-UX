@@ -27,6 +27,7 @@ const UpdateProduct = () => {
       setValue('price', productData.price?.$numberDecimal ?? '');
       setValue('date', productData.date ?? '');
       setValue('time', productData.time ?? '');
+      setValue('venue', productData.venue ?? '');
       setValue('location', productData.location ?? '');
     }
   }, [productData, setValue]);
@@ -40,6 +41,7 @@ const UpdateProduct = () => {
     formData.append('price', data.price ?? '');
     formData.append('date', data.date ?? '');
     formData.append('time', data.time ?? '');
+    formData.append('venue', data.venue ?? '');
     formData.append('location', data.location ?? '');
 
     if (eventImage) formData.append('eventImage', eventImage);
@@ -98,6 +100,7 @@ const UpdateProduct = () => {
         <InputField label="Price" name="price" type="number" placeholder="Enter price" register={register} />
         <InputField label="Date" name="date" type="date" register={register} />
         <InputField label="Time" name="time" type="time" register={register} />
+        <InputField label="Venue" name="venue" type="text" register={register} placeholder="Enter venue" />
         <InputField label="Location" name="location" type="text" register={register} placeholder="Event Location" />
 
         <div className="mb-4">

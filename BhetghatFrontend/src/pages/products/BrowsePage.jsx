@@ -66,7 +66,7 @@ const BrowsePage = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* FILTERS */}
-          <aside className="lg:w-1/4 w-full bg-white rounded-2xl shadow-lg p-6 space-y-6">
+          <aside className="lg:w-1/4 h-1/2 w-full bg-white rounded-2xl shadow-lg p-6 space-y-6">
             <div className="flex items-center gap-2 text-blue-600 font-semibold text-lg">
               <FiFilter />
               Filters

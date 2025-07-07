@@ -1,12 +1,11 @@
-import React from 'react';
+import { FaCalendarAlt, FaMoneyBillWave } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { getImgUrl } from '../../utils/getImgUrl';
-import { FaCalendarAlt, FaMoneyBillWave } from 'react-icons/fa';
 
 const ProductCard = ({ product }) => {
   const price = Number(product.price?.$numberDecimal || 0);
   const time = product.time || 'N/A';
-  const location = product.location || 'N/A';
+  const venue = product.venue || 'N/A';
   const category = product.category || 'Event';
 
   const eventDate = new Date(product.date);
@@ -42,7 +41,8 @@ const ProductCard = ({ product }) => {
         {/* Event Info */}
         <div className="p-4 space-y-2">
           <h3 className="text-lg font-bold">{product.title}</h3>
-          <p className="text-sm text-gray-500">{location}</p>
+
+          <p className="text-sm text-gray-500">{venue}</p>
 
           {/* Time & Price Info */}
           <div className="flex items-center text-sm text-gray-600 gap-3 mt-1">

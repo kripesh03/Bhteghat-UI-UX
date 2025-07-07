@@ -37,6 +37,7 @@ const createProduct = async (req, res) => {
         category = null,
         date = null,
         time = null,
+        venue = null,
         location = null,
       } = req.body;
 
@@ -62,6 +63,7 @@ const createProduct = async (req, res) => {
         date,
         time,
         location,
+        venue,
         eventImage,
         eventFile,
         profileImage

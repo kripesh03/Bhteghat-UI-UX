@@ -31,7 +31,7 @@ const SingleProduct = () => {
   const price = Number(product.price?.$numberDecimal || 0);
 
   return (
-    <div className="max-w-5xl mx-auto mt-10 bg-white shadow-2xl rounded-2xl overflow-hidden p-6 flex flex-col md:flex-row gap-6">
+    <div className="max-w-5xl mx-auto mt-10 mb-10 bg-white shadow-2xl rounded-2xl overflow-hidden p-6 flex flex-col md:flex-row gap-6">
       {/* Confirmation Modal */}
       {showConfirmation && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center px-4">
@@ -130,6 +130,8 @@ const SingleProduct = () => {
             Outdoor
           </span>
         </div>
+        
+        <p className="text-gray-900 my-2">{product.venue}</p>
 
         <p className="text-gray-700 mb-4">
           {product.description || "No description provided."}
@@ -139,6 +141,7 @@ const SingleProduct = () => {
       {/* Right Section: RSVP Card */}
       <div className="md:w-1/3 flex flex-col gap-6">
         <div className="bg-gray-50 rounded-xl p-6 shadow-md">
+
           <p className="text-xl font-semibold mb-2">RSVP for this Event</p>
           <button
             onClick={() => setShowConfirmation(true)}
@@ -168,10 +171,11 @@ const SingleProduct = () => {
             </div>
           </div>
 
-          <div className="mt-4 flex items-start gap-2 text-gray-700">
-            <MapPin className="w-5 h-5 text-indigo-600 mt-0.5" />
-            <span>{product.location}</span>
-          </div>
+            <div className="mt-4 flex items-start gap-2 text-gray-700">
+  <MapPin className="w-5 h-5 text-indigo-600 mt-0.5 shrink-0 flex-none" />
+  <span className="break-words">{product.location}</span>
+</div>
+
         </div>
       </div>
     </div>

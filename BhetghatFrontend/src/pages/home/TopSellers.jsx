@@ -32,7 +32,7 @@ export const TopSellers = () => {
     <section className="bg-white py-12 w-full">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-    s    <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-8">
+        <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-8">
           <h2 className="text-2xl md:text-3xl font-bold text-[#1A237E]">
             Recommended For You
           </h2>
@@ -86,7 +86,7 @@ export const TopSellers = () => {
               </SwiperSlide>
             ))
           ) : (
-            <p className="text-gray-500">No matching products found</p>
+            <p className="text-gray-500">No events found</p>
           )}
         </Swiper>
       </div>

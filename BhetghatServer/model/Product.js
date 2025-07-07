@@ -48,6 +48,10 @@ const productSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    venue:{
+      type: String,
+      default: null,
+    },
     location: {
       type: String,
       default: null,
