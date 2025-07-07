@@ -94,6 +94,7 @@ const AdminLogin = () => {
                 name="username"
                 id="username"
                 placeholder='Your Username'
+                defaultValue="admin"
                 className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
               />
               {errors.username && <p className="text-red-500 text-xs italic mt-1">Username is required</p>}
@@ -108,6 +109,7 @@ const AdminLogin = () => {
                 name="password"
                 id="password"
                 placeholder='Password'
+                defaultValue='123456'
                 className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
               />
               {errors.password && <p className="text-red-500 text-xs italic mt-1">Password is required</p>}
